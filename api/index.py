@@ -1,4 +1,4 @@
-# api/index.py
+# api/index.py (Temporary Test Version with Your Key)
 
 from flask import Flask, render_template
 import requests
@@ -8,14 +8,13 @@ import os
 app = Flask(__name__, template_folder='../', static_folder='../')
 
 # --- CONFIGURATION ---
-# IMPORTANT: We will add your API Key here later using Vercel's secure secrets.
-API_KEY = os.environ.get("FOOTBALL_DATA_API_KEY", "YOUR_FALLBACK_API_KEY")
+# Your API key has been added directly for this test.
+API_KEY = "aa5ce28e561641879baddc65c273298d"
 API_URL = "https://api.football-data.org/v4/competitions/PL/matches"
 
 # --- TRIAL LOGIC ---
 # This sets the site to expire ON 2025-08-15.
-# The launch date is automatically set to 3 days before the expiration.
-EXPIRATION_DATE = datetime(2025, 9, 15)
+EXPIRATION_DATE = datetime(2025, 8, 15)
 
 @app.route('/')
 def home():
@@ -32,7 +31,7 @@ def home():
         headers = {'X-Auth-Token': API_KEY}
         
         # Define the date range: today for the next 3 days
-        date_from = today.strftime('%Y-%-m-%d')
+        date_from = today.strftime('%Y-%m-%d')
         date_to = (today + timedelta(days=3)).strftime('%Y-%m-%d')
         
         params = {
