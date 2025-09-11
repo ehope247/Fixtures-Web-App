@@ -1,4 +1,4 @@
-/* style.css */
+/* style.css (Final Version with Back Button Fix) */
 
 :root {
     --primary-bg: #121212; /* Very dark grey, almost black */
@@ -49,11 +49,11 @@ header p {
     cursor: pointer;
     margin-bottom: 2rem;
     transition: all 0.2s ease-in-out;
+    display: none; /* --- THIS IS THE FIX: The button is now hidden by default --- */
 }
 
-#back-button:hover {
-    background-color: var(--secondary-bg);
-    border-color: var(--accent-color);
+#back-button.visible {
+    display: block; /* The JavaScript will add this class to show the button */
 }
 
 #content-area {
@@ -68,8 +68,6 @@ header p {
     border: 1px solid var(--border-color);
     cursor: pointer;
     overflow: hidden;
-
-    /* --- TRANSFORMATION ANIMATION --- */
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
