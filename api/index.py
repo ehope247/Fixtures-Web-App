@@ -14,7 +14,7 @@ API_URL = "https://api.football-data.org/v4/competitions/PL/matches"
 
 # --- TRIAL LOGIC ---
 # This sets the site to expire ON 2025-08-15.
-EXPIRATION_DATE = datetime(2025, 8, 15)
+EXPIRATION_DATE = datetime(2025, 9, 15)
 
 @app.route('/')
 def home():
