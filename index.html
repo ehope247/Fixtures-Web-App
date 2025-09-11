@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Premium Football Fixtures</title>
+    <!-- This links to our CSS file for styling and animations -->
+    <link rel="stylesheet" href="style.css">
+    <!-- This imports a modern font from Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <header>
+        <h1>Premium Football Fixtures</h1>
+        <p>Your exclusive source for the next 3 days of Premier League action.</p>
+    </header>
+
+    <main class="fixture-list">
+        <!-- This is where the Python code will insert the fixture data -->
+        <!-- The 'all_fixtures' variable comes directly from our Python script -->
+        {% for date, fixtures in all_fixtures.items() %}
+            <div class="date-group">
+                <h2>{{ date }}</h2>
+                {% for fixture in fixtures %}
+                    <div class="fixture-card">
+                        <div class="team">
+                            <img src="{{ fixture.homeTeam.crest }}" alt="{{ fixture.homeTeam.name }} logo" class="team-logo">
+                            <span class="team-name">{{ fixture.homeTeam.name }}</span>
+                        </div>
+                        <div class="match-info">
+                            <span class="match-time">{{ fixture.matchTime }}</span>
+                            <span class="vs">vs</span>
+                        </div>
+                        <div class="team team-away">
+                            <span class="team-name">{{ fixture.awayTeam.name }}</span>
+                            <img src="{{ fixture.awayTeam.crest }}" alt="{{ fixture.awayTeam.name }} logo" class="team-logo">
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <!-- This message will show if the API returns no fixtures -->
+            <div class="no-fixtures">
+                <p>No scheduled fixtures found for the next 3 days.</p>
+            </div>
+        {% endfor %}
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Your Brand Name. All rights reserved.</p>
+    </footer>
+
+</body>
+</html>

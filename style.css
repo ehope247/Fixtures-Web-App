@@ -1,0 +1,163 @@
+/* style.css */
+
+/* --- Basic Setup & Modern Font --- */
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #1a1a2e; /* Dark blue background */
+    color: #e0e0e0; /* Light grey text */
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* --- Header Styling --- */
+header {
+    text-align: center;
+    margin-bottom: 40px;
+    animation: fadeInDown 1s ease-in-out;
+}
+
+header h1 {
+    font-size: 2.5rem;
+    color: #ffffff;
+    font-weight: 700;
+    margin-bottom: 5px;
+}
+
+header p {
+    font-size: 1.1rem;
+    color: #a9a9d4; /* Light purple-blue */
+    font-weight: 300;
+}
+
+/* --- Main Fixture List Container --- */
+.fixture-list {
+    width: 100%;
+    max-width: 800px;
+}
+
+/* --- Date Group Styling --- */
+.date-group h2 {
+    font-size: 1.5rem;
+    color: #ffffff;
+    border-bottom: 2px solid #3c3c7e; /* Darker purple-blue line */
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+    margin-top: 40px;
+}
+
+/* --- The Fixture Card: The Core of the Design --- */
+.fixture-card {
+    background-color: #242444; /* Slightly lighter card background */
+    border-radius: 12px;
+    margin-bottom: 15px;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    
+    /* --- ANIMATIONS --- */
+    opacity: 0; /* Start invisible */
+    transform: translateY(20px); /* Start slightly lower */
+    animation: fadeInUp 0.5s ease-out forwards;
+}
+
+/* Stagger the animation for each card */
+.fixture-card:nth-child(2) { animation-delay: 0.1s; }
+.fixture-card:nth-child(3) { animation-delay: 0.2s; }
+.fixture-card:nth-child(4) { animation-delay: 0.3s; }
+/* Add more if you expect more than 3 fixtures per day */
+
+/* --- Team Logo and Name Styling --- */
+.team {
+    display: flex;
+    align-items: center;
+    flex: 1; /* Allows team sections to grow and shrink */
+}
+
+.team-logo {
+    width: 40px;
+    height: 40px;
+    margin-right: 15px;
+}
+
+.team-away .team-logo {
+    margin-left: 15px;
+    margin-right: 0;
+}
+
+.team-name {
+    font-size: 1.2rem;
+    font-weight: 700;
+}
+
+.team-away {
+    justify-content: flex-end; /* Pushes content to the right */
+    text-align: right;
+}
+
+/* --- Match Info (Time, "vs") Styling --- */
+.match-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 0 20px;
+}
+
+.match-time {
+    background-color: #3c3c7e;
+    color: #ffffff;
+    font-weight: bold;
+    padding: 5px 10px;
+    border-radius: 6px;
+    font-size: 1rem;
+}
+
+.vs {
+    font-size: 0.9rem;
+    color: #a9a9d4;
+    margin-top: 5px;
+    font-weight: 300;
+}
+
+/* --- No Fixtures Message --- */
+.no-fixtures {
+    text-align: center;
+    padding: 40px;
+    font-size: 1.2rem;
+    color: #a9a9d4;
+}
+
+/* --- Footer --- */
+footer {
+    margin-top: 50px;
+    text-align: center;
+    font-size: 0.9rem;
+    color: #6a6a9f;
+}
+
+/* --- KEYFRAME ANIMATIONS --- */
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
