@@ -1,163 +1,201 @@
 /* style.css */
 
-/* --- Basic Setup & Modern Font --- */
-body {
-    font-family: 'Roboto', sans-serif;
-    background-color: #1a1a2e; /* Dark blue background */
-    color: #e0e0e0; /* Light grey text */
-    margin: 0;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+:root {
+    --primary-bg: #121212; /* Very dark grey, almost black */
+    --secondary-bg: #1E1E1E; /* Lighter grey for cards */
+    --accent-color: #BB86FC; /* Vibrant purple */
+    --accent-color-hover: #D0A5FF;
+    --primary-text: #E0E0E0; /* Off-white */
+    --secondary-text: #A0A0A0; /* Grey for subtitles */
+    --border-color: #333333;
 }
 
-/* --- Header Styling --- */
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--primary-bg);
+    color: var(--primary-text);
+    margin: 0;
+    padding: 2rem;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
 header {
     text-align: center;
-    margin-bottom: 40px;
-    animation: fadeInDown 1s ease-in-out;
+    margin-bottom: 2rem;
 }
 
 header h1 {
-    font-size: 2.5rem;
-    color: #ffffff;
+    font-size: 3rem;
     font-weight: 700;
-    margin-bottom: 5px;
+    color: #FFFFFF;
 }
 
 header p {
-    font-size: 1.1rem;
-    color: #a9a9d4; /* Light purple-blue */
-    font-weight: 300;
+    font-size: 1.2rem;
+    color: var(--secondary-text);
 }
 
-/* --- Main Fixture List Container --- */
-.fixture-list {
-    width: 100%;
-    max-width: 800px;
+#back-button {
+    background-color: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--primary-text);
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-bottom: 2rem;
+    transition: all 0.2s ease-in-out;
 }
 
-/* --- Date Group Styling --- */
-.date-group h2 {
-    font-size: 1.5rem;
-    color: #ffffff;
-    border-bottom: 2px solid #3c3c7e; /* Darker purple-blue line */
-    padding-bottom: 10px;
-    margin-bottom: 20px;
-    margin-top: 40px;
+#back-button:hover {
+    background-color: var(--secondary-bg);
+    border-color: var(--accent-color);
 }
 
-/* --- The Fixture Card: The Core of the Design --- */
-.fixture-card {
-    background-color: #242444; /* Slightly lighter card background */
+#content-area {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+.card {
+    background-color: var(--secondary-bg);
     border-radius: 12px;
-    margin-bottom: 15px;
-    padding: 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-    
-    /* --- ANIMATIONS --- */
-    opacity: 0; /* Start invisible */
-    transform: translateY(20px); /* Start slightly lower */
-    animation: fadeInUp 0.5s ease-out forwards;
+    border: 1px solid var(--border-color);
+    cursor: pointer;
+    overflow: hidden;
+
+    /* --- TRANSFORMATION ANIMATION --- */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-/* Stagger the animation for each card */
-.fixture-card:nth-child(2) { animation-delay: 0.1s; }
-.fixture-card:nth-child(3) { animation-delay: 0.2s; }
-.fixture-card:nth-child(4) { animation-delay: 0.3s; }
-/* Add more if you expect more than 3 fixtures per day */
+.card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+    border-color: var(--accent-color);
+}
 
-/* --- Team Logo and Name Styling --- */
+.competition-card {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+}
+
+.competition-logo {
+    width: 50px;
+    height: 50px;
+    margin-right: 1rem;
+}
+
+.competition-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.competition-name {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #FFFFFF;
+}
+
+.competition-country {
+    font-size: 0.9rem;
+    color: var(--secondary-text);
+}
+
+.fixture-card {
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
 .team {
     display: flex;
     align-items: center;
-    flex: 1; /* Allows team sections to grow and shrink */
+    gap: 0.75rem;
+    width: 40%;
+}
+.team-away { justify-content: flex-end; }
+.team-logo { width: 35px; height: 35px; }
+.team-name { font-weight: 600; font-size: 1.1rem; }
+
+.match-info { text-align: center; }
+.match-time { font-weight: 700; font-size: 1.2rem; color: #FFFFFF; }
+.vs { color: var(--secondary-text); font-size: 0.8rem; }
+
+
+/* --- Details View Styling --- */
+.details-view {
+    grid-column: 1 / -1; /* Make this take the full width */
+    color: var(--primary-text);
 }
 
-.team-logo {
-    width: 40px;
-    height: 40px;
-    margin-right: 15px;
-}
-
-.team-away .team-logo {
-    margin-left: 15px;
-    margin-right: 0;
-}
-
-.team-name {
-    font-size: 1.2rem;
-    font-weight: 700;
-}
-
-.team-away {
-    justify-content: flex-end; /* Pushes content to the right */
-    text-align: right;
-}
-
-/* --- Match Info (Time, "vs") Styling --- */
-.match-info {
+.details-header {
     display: flex;
-    flex-direction: column;
+    justify-content: space-around;
     align-items: center;
-    margin: 0 20px;
+    padding: 2rem;
+    background-color: var(--secondary-bg);
+    border-radius: 12px;
+    margin-bottom: 2rem;
 }
 
-.match-time {
-    background-color: #3c3c7e;
-    color: #ffffff;
-    font-weight: bold;
-    padding: 5px 10px;
-    border-radius: 6px;
-    font-size: 1rem;
+.team-logo-large { width: 80px; height: 80px; }
+#details-home-name, #details-away-name { font-size: 2rem; font-weight: 700; }
+.vs-large { font-size: 1.5rem; color: var(--secondary-text); }
+
+.details-body {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 2rem;
 }
 
-.vs {
-    font-size: 0.9rem;
-    color: #a9a9d4;
-    margin-top: 5px;
-    font-weight: 300;
+.panel-content {
+    background-color: var(--secondary-bg);
+    padding: 1.5rem;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    white-space: pre-wrap; /* Respects new lines from AI */
+    line-height: 1.6;
 }
 
-/* --- No Fixtures Message --- */
-.no-fixtures {
-    text-align: center;
-    padding: 40px;
-    font-size: 1.2rem;
-    color: #a9a9d4;
+.panel-content a {
+    color: var(--accent-color);
+    text-decoration: none;
+    display: block;
+    margin-bottom: 0.5rem;
+}
+.panel-content a:hover { text-decoration: underline; }
+
+
+/* --- Loader & Utility Classes --- */
+.loader {
+    border: 4px solid var(--border-color);
+    border-top: 4px solid var(--accent-color);
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+    margin: 5rem auto;
 }
 
-/* --- Footer --- */
-footer {
-    margin-top: 50px;
-    text-align: center;
-    font-size: 0.9rem;
-    color: #6a6a9f;
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }
 
-/* --- KEYFRAME ANIMATIONS --- */
-@keyframes fadeInDown {
-    from {
-        opacity: 0;
-        transform: translateY(-20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
+.hidden { display: none !important; }
 
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+/* Animation for content appearing */
+.fade-in {
+    animation: fadeIn 0.5s ease-in-out;
+}
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
 }

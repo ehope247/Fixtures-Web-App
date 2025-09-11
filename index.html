@@ -3,55 +3,95 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Premium Football Fixtures</title>
-    <!-- This links to our CSS file for styling and animations -->
+    <title>Dynamic Football Center</title>
+    <!-- Link to our new CSS for the masterpiece design -->
     <link rel="stylesheet" href="style.css">
-    <!-- This imports a modern font from Google Fonts -->
+    <!-- Import a professional font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
 
-    <header>
-        <h1>Premium Football Fixtures</h1>
-        <p>Your exclusive source for the next 3 days of Premier League action.</p>
-    </header>
+    <div class="container">
+        <header>
+            <h1>Dynamic Football Center</h1>
+            <p id="header-subtitle">Select a competition to see upcoming fixtures.</p>
+        </header>
 
-    <main class="fixture-list">
-        <!-- This is where the Python code will insert the fixture data -->
-        <!-- The 'all_fixtures' variable comes directly from our Python script -->
-        {% for date, fixtures in all_fixtures.items() %}
-            <div class="date-group">
-                <h2>{{ date }}</h2>
-                {% for fixture in fixtures %}
-                    <div class="fixture-card">
-                        <div class="team">
-                            <img src="{{ fixture.homeTeam.crest }}" alt="{{ fixture.homeTeam.name }} logo" class="team-logo">
-                            <span class="team-name">{{ fixture.homeTeam.name }}</span>
-                        </div>
-                        <div class="match-info">
-                            <span class="match-time">{{ fixture.matchTime }}</span>
-                            <span class="vs">vs</span>
-                        </div>
-                        <div class="team team-away">
-                            <span class="team-name">{{ fixture.awayTeam.name }}</span>
-                            <img src="{{ fixture.awayTeam.crest }}" alt="{{ fixture.awayTeam.name }} logo" class="team-logo">
+        <!-- The "Back" button, hidden by default -->
+        <button id="back-button" class="hidden">&larr; Back to Competitions</button>
+
+        <!-- Main content area where everything will be displayed -->
+        <main id="content-area">
+            <!-- This section will be filled by JavaScript -->
+        </main>
+
+        <!-- A loading spinner, hidden by default -->
+        <div id="loader" class="loader hidden"></div>
+
+        <!-- This is a template for a competition card. JS will copy this. -->
+        <template id="competition-card-template">
+            <div class="card competition-card">
+                <img class="competition-logo" src="" alt="Competition Emblem">
+                <div class="competition-info">
+                    <span class="competition-name"></span>
+                    <span class="competition-country"></span>
+                </div>
+            </div>
+        </template>
+
+        <!-- This is a template for a fixture card. JS will copy this. -->
+        <template id="fixture-card-template">
+            <div class="card fixture-card">
+                <div class="team">
+                    <img src="" alt="Home Team Logo" class="team-logo">
+                    <span class="team-name"></span>
+                </div>
+                <div class="match-info">
+                    <span class="match-time"></span>
+                    <span class="vs">vs</span>
+                </div>
+                <div class="team team-away">
+                    <span class="team-name"></span>
+                    <img src="" alt="Away Team Logo" class="team-logo">
+                </div>
+            </div>
+        </template>
+
+        <!-- This is a template for the details view. JS will copy this. -->
+        <template id="details-view-template">
+            <div class="details-view">
+                <div class="details-header">
+                    <div class="team">
+                        <img id="details-home-logo" src="" class="team-logo-large">
+                        <span id="details-home-name"></span>
+                    </div>
+                    <span class="vs-large">vs</span>
+                    <div class="team">
+                        <span id="details-away-name"></span>
+                        <img id="details-away-logo" src="" class="team-logo-large">
+                    </div>
+                </div>
+                <div class="details-body">
+                    <div class="prediction-panel">
+                        <h3>🤖 AI Analysis & Predictions</h3>
+                        <div id="prediction-content" class="panel-content">
+                            <!-- AI prediction text goes here -->
                         </div>
                     </div>
-                {% endfor %}
+                    <div class="news-panel">
+                        <h3>📰 Latest News</h3>
+                        <div id="news-content" class="panel-content">
+                            <!-- News links go here -->
+                        </div>
+                    </div>
+                </div>
             </div>
-        {% else %}
-            <!-- This message will show if the API returns no fixtures -->
-            <div class="no-fixtures">
-                <p>No scheduled fixtures found for the next 3 days.</p>
-            </div>
-        {% endfor %}
-    </main>
+        </template>
+    </div>
 
-    <footer>
-        <p>&copy; 2024 Your Brand Name. All rights reserved.</p>
-    </footer>
-
+    <!-- This links to our new JavaScript file for interactivity -->
+    <script src="script.js"></script>
 </body>
 </html>
