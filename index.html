@@ -4,9 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dynamic Football Center</title>
-    <!-- Link to our new CSS for the masterpiece design -->
     <link rel="stylesheet" href="style.css">
-    <!-- Import a professional font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
@@ -19,18 +17,16 @@
             <p id="header-subtitle">Select a competition to see upcoming fixtures.</p>
         </header>
 
-        <!-- The "Back" button, hidden by default -->
-        <button id="back-button" class="hidden">&larr; Back to Competitions</button>
+        <!-- THIS IS THE UNBREAKABLE FIX: The style is added directly to the element -->
+        <button id="back-button" style="display: none;">&larr; Back to Competitions</button>
 
-        <!-- Main content area where everything will be displayed -->
         <main id="content-area">
             <!-- This section will be filled by JavaScript -->
         </main>
 
-        <!-- A loading spinner, hidden by default -->
-        <div id="loader" class="loader hidden"></div>
+        <div id="loader" class="hidden"></div>
 
-        <!-- This is a template for a competition card. JS will copy this. -->
+        <!-- TEMPLATES (Unchanged) -->
         <template id="competition-card-template">
             <div class="card competition-card">
                 <img class="competition-logo" src="" alt="Competition Emblem">
@@ -40,8 +36,6 @@
                 </div>
             </div>
         </template>
-
-        <!-- This is a template for a fixture card. JS will copy this. -->
         <template id="fixture-card-template">
             <div class="card fixture-card">
                 <div class="team">
@@ -58,8 +52,6 @@
                 </div>
             </div>
         </template>
-
-        <!-- This is a template for the details view. JS will copy this. -->
         <template id="details-view-template">
             <div class="details-view">
                 <div class="details-header">
@@ -76,22 +68,16 @@
                 <div class="details-body">
                     <div class="prediction-panel">
                         <h3>🤖 AI Analysis & Predictions</h3>
-                        <div id="prediction-content" class="panel-content">
-                            <!-- AI prediction text goes here -->
-                        </div>
+                        <div id="prediction-content" class="panel-content"></div>
                     </div>
                     <div class="news-panel">
                         <h3>📰 Latest News</h3>
-                        <div id="news-content" class="panel-content">
-                            <!-- News links go here -->
-                        </div>
+                        <div id="news-content" class="panel-content"></div>
                     </div>
                 </div>
             </div>
         </template>
     </div>
-
-    <!-- This links to our new JavaScript file for interactivity -->
     <script src="script.js"></script>
 </body>
 </html>
