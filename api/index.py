@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 import os
 import json
 
-app = Flask(__name__, template_folder='../', static_folder='../')
+app = Flask(__name__, template_folder='../public', static_folder='../public')
 
 # --- Securely Load API Keys from Vercel ---
 FOOTBALL_API_KEY = os.environ.get("FOOTBALL_DATA_API_KEY")
