@@ -185,3 +185,69 @@ header {
     from { opacity: 0; transform: translateY(20px); }
     to { opacity: 1; transform: translateY(0); }
 }
+/* --- Responsive Design for Mobile Screens --- */
+
+@media (max-width: 768px) {
+    body {
+        padding: 1rem; /* Less padding on small screens */
+    }
+
+    .main-title {
+        font-size: 2.5rem; /* Smaller main title */
+        letter-spacing: -1px;
+    }
+
+    .subtitle {
+        font-size: 1.1rem;
+    }
+
+    #content-area {
+        /* On mobile, stack cards in a single column */
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .fixture-card {
+        /* Make the fixture layout more vertical on mobile */
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+        text-align: center;
+    }
+
+    .home-team, .away-team {
+        /* Center teams and logos */
+        width: 100%;
+        justify-content: center;
+    }
+
+    .home-team {
+        /* Put home team name on top of logo */
+        flex-direction: column-reverse;
+    }
+    
+    .away-team {
+        /* Put away team name on top of logo */
+        flex-direction: column;
+    }
+
+    .details-header {
+        /* Stack the header on mobile */
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    #details-home-name, #details-away-name {
+        font-size: 1.8rem; /* Smaller team names */
+    }
+
+    .vs-large {
+        /* Make the "VS" smaller and rotate it for style */
+        transform: rotate(-90deg);
+        margin: 1rem 0;
+    }
+
+    .details-grid {
+        /* Stack the prediction and news panels */
+        grid-template-columns: 1fr;
+    }
+}
