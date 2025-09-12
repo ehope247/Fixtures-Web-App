@@ -3,81 +3,92 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dynamic Football Center</title>
+    <title>AI Football Predictor</title>
+    <!-- Link to our new CSS for the masterpiece design -->
     <link rel="stylesheet" href="style.css">
+    <!-- Import a professional font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
 
     <div class="container">
         <header>
-            <h1>Dynamic Football Center</h1>
-            <p id="header-subtitle">Select a competition to see upcoming fixtures.</p>
+            <h1 class="main-title">AI Football Predictor</h1>
+            <p id="header-subtitle" class="subtitle">Select a Competition to Begin</p>
         </header>
 
-        <!-- THIS IS THE UNBREAKABLE FIX: The style is added directly to the element -->
-        <button id="back-button" style="display: none;">&larr; Back to Competitions</button>
+        <nav id="breadcrumb-nav" class="hidden">
+            <button id="back-button">← Back</button>
+        </nav>
 
         <main id="content-area">
-            <!-- This section will be filled by JavaScript -->
+            <!-- JavaScript will build all content here -->
         </main>
 
-        <div id="loader" class="hidden"></div>
-
-        <!-- TEMPLATES (Unchanged) -->
-        <template id="competition-card-template">
-            <div class="card competition-card">
-                <img class="competition-logo" src="" alt="Competition Emblem">
-                <div class="competition-info">
-                    <span class="competition-name"></span>
-                    <span class="competition-country"></span>
-                </div>
-            </div>
-        </template>
-        <template id="fixture-card-template">
-            <div class="card fixture-card">
-                <div class="team">
-                    <img src="" alt="Home Team Logo" class="team-logo">
-                    <span class="team-name"></span>
-                </div>
-                <div class="match-info">
-                    <span class="match-time"></span>
-                    <span class="vs">vs</span>
-                </div>
-                <div class="team team-away">
-                    <span class="team-name"></span>
-                    <img src="" alt="Away Team Logo" class="team-logo">
-                </div>
-            </div>
-        </template>
-        <template id="details-view-template">
-            <div class="details-view">
-                <div class="details-header">
-                    <div class="team">
-                        <img id="details-home-logo" src="" class="team-logo-large">
-                        <span id="details-home-name"></span>
-                    </div>
-                    <span class="vs-large">vs</span>
-                    <div class="team">
-                        <span id="details-away-name"></span>
-                        <img id="details-away-logo" src="" class="team-logo-large">
-                    </div>
-                </div>
-                <div class="details-body">
-                    <div class="prediction-panel">
-                        <h3>🤖 AI Analysis & Predictions</h3>
-                        <div id="prediction-content" class="panel-content"></div>
-                    </div>
-                    <div class="news-panel">
-                        <h3>📰 Latest News</h3>
-                        <div id="news-content" class="panel-content"></div>
-                    </div>
-                </div>
-            </div>
-        </template>
+        <div id="loader" class="loader-container hidden">
+            <div class="loader"></div>
+            <p class="loader-text">Fetching Data...</p>
+        </div>
     </div>
+
+    <!-- TEMPLATES: These are the blueprints for our JavaScript -->
+
+    <template id="competition-card-template">
+        <div class="card competition-card" tabindex="0">
+            <img class="competition-logo" src="" alt="Competition Emblem">
+            <div class="competition-info">
+                <span class="competition-name"></span>
+                <span class="competition-country"></span>
+            </div>
+        </div>
+    </template>
+
+    <template id="fixture-card-template">
+        <div class="card fixture-card" tabindex="0">
+            <div class="team home-team">
+                <span class="team-name"></span>
+                <img src="" alt="Home Team Logo" class="team-logo">
+            </div>
+            <div class="match-info">
+                <span class="match-time"></span>
+                <span class="vs">VS</span>
+            </div>
+            <div class="team away-team">
+                <img src="" alt="Away Team Logo" class="team-logo">
+                <span class="team-name"></span>
+            </div>
+        </div>
+    </template>
+
+    <template id="details-view-template">
+        <div class="details-view">
+            <div class="details-header">
+                <div class="team">
+                    <img id="details-home-logo" src="" class="team-logo-large">
+                    <h2 id="details-home-name"></h2>
+                </div>
+                <h2 class="vs-large">VS</h2>
+                <div class="team away-team">
+                    <h2 id="details-away-name"></h2>
+                    <img id="details-away-logo" src="" class="team-logo-large">
+                </div>
+            </div>
+            <div class="details-grid">
+                <div class="panel prediction-panel">
+                    <h3>🤖 AI Analysis &amp; Predictions</h3>
+                    <div id="prediction-content" class="panel-content"></div>
+                </div>
+                <div class="panel news-panel">
+                    <h3>📰 Intelligence Summary</h3>
+                    <div id="news-content" class="panel-content"></div>
+                </div>
+            </div>
+        </div>
+    </template>
+    
+    <!-- Link to our JavaScript "magic" file -->
     <script src="script.js"></script>
 </body>
 </html>
