@@ -1,4 +1,4 @@
-// script.js (The Masterpiece Magic)
+// script.js (Final Version for the Statistical Model)
 
 document.addEventListener('DOMContentLoaded', () => {
     // --- Get references to all the important HTML elements ---
@@ -13,9 +13,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const fixtureCardTemplate = document.getElementById('fixture-card-template');
     const detailsViewTemplate = document.getElementById('details-view-template');
 
-    // --- State Management: Keep track of where the user is ---
+    // --- State Management ---
     let state = {
-        view: 'competitions', // Can be 'competitions', 'fixtures', or 'details'
+        view: 'competitions',
         currentCompetitionId: null,
         currentMatchData: {}
     };
@@ -38,12 +38,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- Rendering Functions: Build the HTML content ---
+    // --- Rendering Functions ---
     function renderCompetitions(competitions) {
         contentArea.innerHTML = '';
         updateHeader('Select a Competition to Begin');
         breadcrumbNav.classList.add('hidden');
-
         competitions.forEach(comp => {
             if (!comp.emblem) return;
             const card = competitionCardTemplate.content.cloneNode(true).children[0];
@@ -60,12 +59,10 @@ document.addEventListener('DOMContentLoaded', () => {
         contentArea.innerHTML = '';
         updateHeader(`Fixtures for ${competitionName}`);
         breadcrumbNav.classList.remove('hidden');
-
         if (fixtures.length === 0) {
             contentArea.innerHTML = '<p class="info-message">No scheduled fixtures found for the next 3 days.</p>';
             return;
         }
-
         fixtures.forEach(fixture => {
             const card = fixtureCardTemplate.content.cloneNode(true).children[0];
             card.querySelector('.home-team .team-logo').src = fixture.homeTeam.crest;
@@ -73,12 +70,16 @@ document.addEventListener('DOMContentLoaded', () => {
             card.querySelector('.match-time').textContent = fixture.utcDate.split('T')[1].slice(0, 5);
             card.querySelector('.away-team .team-logo').src = fixture.awayTeam.crest;
             card.querySelector('.away-team .team-name').textContent = fixture.awayTeam.shortName;
-            card.dataset.id = fixture.id;
-            // Store data needed for the details view
+            
+            // --- CRITICAL CHANGE ---
+            // We now store the team IDs, not just the names and logos
+            card.dataset.homeTeamId = fixture.homeTeam.id;
+            card.dataset.awayTeamId = fixture.awayTeam.id;
             card.dataset.homeTeamName = fixture.homeTeam.name;
             card.dataset.homeTeamLogo = fixture.homeTeam.crest;
             card.dataset.awayTeamName = fixture.awayTeam.name;
             card.dataset.awayTeamLogo = fixture.awayTeam.crest;
+
             contentArea.appendChild(card);
         });
         contentArea.classList.add('fade-in');
@@ -86,38 +87,41 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function renderDetails(details) {
         contentArea.innerHTML = '';
-        updateHeader('AI-Powered Match Analysis');
-        
+        updateHeader('Statistical Match Prediction');
         const view = detailsViewTemplate.content.cloneNode(true).children[0];
         view.querySelector('#details-home-logo').src = state.currentMatchData.homeTeamLogo;
         view.querySelector('#details-home-name').textContent = state.currentMatchData.homeTeamName;
         view.querySelector('#details-away-logo').src = state.currentMatchData.awayTeamLogo;
         view.querySelector('#details-away-name').textContent = state.currentMatchData.awayTeamName;
 
-        // Use innerHTML to render bold/italic tags from AI if any
-        view.querySelector('#prediction-content').innerHTML = details.prediction.replace(/\n/g, '<br>');
-        view.querySelector('#news-content').innerHTML = details.newsSummary.replace(/\n/g, '<br>');
+        // Display the direct prediction from our new model
+        view.querySelector('#prediction-content').textContent = details.prediction;
 
         contentArea.appendChild(view);
         contentArea.classList.add('fade-in');
     }
 
-    // --- Navigation and Event Handling ---
-    async function navigate(event) {
-        const target = event.target.closest('[data-id]');
-        if (!target) return;
+    // --- Event Handling ---
+    async function handleCardClick(event) {
+        const card = event.target.closest('.card');
+        if (!card) return;
 
-        const id = target.dataset.id;
-        if (target.classList.contains('competition-card')) {
+        if (card.classList.contains('competition-card')) {
+            const competitionId = card.dataset.id;
             state.view = 'fixtures';
-            state.currentCompetitionId = id;
-            const competitionName = target.querySelector('.competition-name').textContent;
-            const fixtures = await fetchData(`/api/fixtures?id=${id}`);
+            state.currentCompetitionId = competitionId;
+            const competitionName = card.querySelector('.competition-name').textContent;
+            const fixtures = await fetchData(`/api/fixtures?id=${competitionId}`);
             if (fixtures) renderFixtures(fixtures, competitionName);
-        } else if (target.classList.contains('fixture-card')) {
+
+        } else if (card.classList.contains('fixture-card')) {
+            // --- CRITICAL CHANGE ---
+            // We now send the team IDs to our new API endpoint
+            const homeId = card.dataset.homeTeamId;
+            const awayId = card.dataset.awayTeamId;
             state.view = 'details';
-            state.currentMatchData = target.dataset;
-            const details = await fetchData(`/api/details?id=${id}`);
+            state.currentMatchData = card.dataset;
+            const details = await fetchData(`/api/details?home_id=${homeId}&away_id=${awayId}`);
             if (details) renderDetails(details);
         }
     }
@@ -125,24 +129,21 @@ document.addEventListener('DOMContentLoaded', () => {
     function handleBackClick() {
         if (state.view === 'details') {
             state.view = 'fixtures';
-            // Re-fetch fixtures for the current competition
-            const card = document.querySelector(`[data-id="${state.currentCompetitionId}"]`);
-            const competitionName = "Previous Competition"; // Placeholder
+            const competitionName = "Previous Competition";
             fetchData(`/api/fixtures?id=${state.currentCompetitionId}`).then(fixtures => {
-                if(fixtures) renderFixtures(fixtures, competitionName);
+                if (fixtures) renderFixtures(fixtures, competitionName);
             });
         } else if (state.view === 'fixtures') {
             state.view = 'competitions';
-            init(); // Go back to the main competition list
+            init();
         }
     }
-
+    
     // --- Utility Functions ---
     function showLoader(isLoading) {
         loader.classList.toggle('hidden', !isLoading);
         contentArea.classList.toggle('hidden', isLoading);
     }
-
     function updateHeader(subtitle) {
         headerSubtitle.textContent = subtitle;
     }
@@ -155,9 +156,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- Attach Event Listeners ---
-    contentArea.addEventListener('click', navigate);
+    contentArea.addEventListener('click', handleCardClick);
     backButton.addEventListener('click', handleBackClick);
-
-    // --- Start the App ---
     init();
 });

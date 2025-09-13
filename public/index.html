@@ -3,22 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Football Predictor</title>
+    <title>Statistical Football Predictor</title>
     <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-
-    <!-- THIS IS YOUR NEW ADSENSE SCRIPT -->
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7573437727565957"
-     crossorigin="anonymous"></script>
-
 </head>
 <body>
 
     <div class="container">
         <header>
-            <h1 class="main-title">AI Football Predictor</h1>
+            <h1 class="main-title">Statistical Football Predictor</h1>
             <p id="header-subtitle" class="subtitle">Select a Competition to Begin</p>
         </header>
 
@@ -65,6 +60,7 @@
         </div>
     </template>
 
+    <!-- This template is now much simpler -->
     <template id="details-view-template">
         <div class="details-view">
             <div class="details-header">
@@ -80,18 +76,15 @@
             </div>
             <div class="details-grid">
                 <div class="panel prediction-panel">
-                    <h3>🤖 AI Analysis &amp; Predictions</h3>
-                    <div id="prediction-content" class="panel-content"></div>
-                </div>
-                <div class="panel news-panel">
-                    <h3>📰 Intelligence Summary</h3>
-                    <div id="news-content" class="panel-content"></div>
+                    <h3>📊 Statistical Prediction</h3>
+                    <div id="prediction-content" class="panel-content prediction-result">
+                        <!-- The prediction (e.g., "Home Team Win") goes here -->
+                    </div>
                 </div>
             </div>
         </div>
     </template>
     
-    <!-- Link to our JavaScript "magic" file -->
     <script src="script.js"></script>
 </body>
 </html>
