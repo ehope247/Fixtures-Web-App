@@ -1,4 +1,4 @@
-# api/index.py (Temporary Debugging Version to Force Error Message)
+# api/index.py (Final Version with Smart Throttle)
 
 from flask import Flask, render_template, jsonify, request
 import requests
@@ -19,19 +19,19 @@ FOOTBALL_API_BASE_URL = "https://api.football-data.org/v4"
 TAVILY_API_URL = "https://api.tavily.com/search"
 GEMINI_API_URL = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={GEMINI_API_KEY}"
 
-# --- THE CACHE ---
+# --- The Cache (Still important for performance) ---
 api_cache = {}
-CACHE_DURATION_SECONDS = 3600
+CACHE_DURATION_SECONDS = 3600 # Cache results for 1 hour
 
 # --- Main Route ---
 @app.route('/')
 def home():
     return render_template('index.html')
 
-# --- API Endpoints ---
+# --- API Endpoints (These are unchanged) ---
 @app.route('/api/competitions')
 def get_competitions():
-    if not FOOTBALL_API_KEY: return jsonify({"error": "Football API key is not configured"}), 500
+    if not FOOTBALL_API_KEY: return jsonify({"error": "Football API key not configured"}), 500
     headers = {'X-Auth-Token': FOOTBALL_API_KEY}
     try:
         response = requests.get(f"{FOOTBALL_API_BASE_URL}/competitions", headers=headers)
@@ -45,8 +45,7 @@ def get_fixtures():
     competition_id = request.args.get('id')
     if not competition_id: return jsonify({"error": "Competition ID is required"}), 400
     headers = {'X-Auth-Token': FOOTBALL_API_KEY}
-    date_from = datetime.now().strftime('%Y-%m-%d')
-    date_to = (datetime.now() + timedelta(days=3)).strftime('%Y-%m-%d')
+    date_from, date_to = datetime.now().strftime('%Y-%m-%d'), (datetime.now() + timedelta(days=3)).strftime('%Y-%m-%d')
     params = {'dateFrom': date_from, 'dateTo': date_to, 'status': 'SCHEDULED'}
     try:
         response = requests.get(f"{FOOTBALL_API_BASE_URL}/competitions/{competition_id}/matches", headers=headers, params=params)
@@ -76,16 +75,22 @@ def get_details():
         standings_data = standings_response.json() if standings_response.status_code == 200 else None
     except requests.exceptions.RequestException as e:
         return jsonify({"error": f"Failed to get match data: {e}"}), 500
+    
+    # --- SMART THROTTLE IN ACTION ---
+    # The two AI calls are now made one after the other, with a delay.
     prediction = get_gemini_prediction(match_data, standings_data)
-    home_team, away_team = match_data.get('homeTeam', {}).get('name', ''), match_data.get('awayTeam', {}).get('name', '')
-    news_articles = get_tavily_news(f"latest football team news and player injuries for {home_team} and {away_team}")
-    news_summary = get_news_summary(news_articles)
+    news_summary = get_news_summary(match_data)
+
     final_data = {"prediction": prediction, "newsSummary": news_summary}
     api_cache[match_id] = {'timestamp': current_time, 'data': final_data}
     return jsonify(final_data)
 
 # --- Helper Functions ---
 def call_gemini(prompt):
+    # --- THIS IS THE SMART THROTTLE ---
+    print("Waiting for 2 seconds to respect API rate limits...")
+    time.sleep(2) # Add a 2-second delay before every single call
+
     headers = {"Content-Type": "application/json"}
     payload = {"contents": [{"parts": [{"text": prompt}]}]}
     try:
@@ -96,12 +101,19 @@ def call_gemini(prompt):
         if not candidates: return "AI response blocked or empty. Potentially due to safety filters."
         content = candidates[0].get('content', {}).get('parts', [{}])[0].get('text')
         return content or "AI returned an empty response."
+    except requests.exceptions.HTTPError as e:
+        if e.response.status_code == 429:
+            print("Gemini API Error: Rate limit exceeded.")
+            # --- THIS IS THE NEW, PROFESSIONAL ERROR MESSAGE ---
+            return "The AI is currently busy due to high demand. Please try again in 60 seconds."
+        print(f"Gemini Call Error: {e}")
+        return "AI analysis could not be completed at this time."
     except Exception as e:
-        # --- THIS IS THE CRITICAL CHANGE ---
-        # Instead of a generic message, we return the REAL error.
-        return f"The AI has failed. The exact reason is: {e}"
+        print(f"Gemini Call Error: {e}")
+        return "AI analysis could not be completed at this time."
 
 def get_gemini_prediction(match_data, standings=None):
+    # This function is now cleaner as the delay is handled by call_gemini
     home_team_name, away_team_name = match_data.get('homeTeam', {}).get('name', 'Home'), match_data.get('awayTeam', {}).get('name', 'Away')
     prompt = (f"You are a world-class football analyst. Provide a concise, expert analysis for the match between {home_team_name} and {away_team_name}.\n\n")
     if standings and standings.get('standings'):
@@ -118,6 +130,7 @@ def get_gemini_prediction(match_data, standings=None):
     return call_gemini(prompt)
 
 def get_tavily_news(query):
+    # This function is unchanged
     headers = {"Authorization": f"Bearer {TAVILY_API_KEY}", "Content-Type": "application/json"}
     payload = json.dumps({"query": query, "search_depth": "basic", "include_raw_content": True, "max_results": 3})
     try:
@@ -128,14 +141,13 @@ def get_tavily_news(query):
         print(f"Tavily Error: {e}")
         return []
 
-def get_news_summary(articles):
-    if not articles:
-        return "No recent news found."
+def get_news_summary(match_data):
+    # This function now calls the throttled call_gemini function
+    home_team, away_team = match_data.get('homeTeam', {}).get('name', ''), match_data.get('awayTeam', {}).get('name', '')
+    articles = get_tavily_news(f"latest football team news and player injuries for {home_team} and {away_team}")
+    if not articles: return "No recent news found."
     raw_content = ""
     for article in articles:
         raw_content += f"Article Title: {article.get('title')}\nContent: {article.get('raw_content', '')}\n\n"
-    prompt = (f"You are an intelligence analyst. Read the following news articles about two football teams. "
-              f"Provide a short, bulleted summary of the key information, such as player injuries, team morale, or recent news. "
-              f"Do not make up information. If there is no important news, say so.\n\n"
-              f"ARTICLES:\n{raw_content}")
+    prompt = (f"You are an intelligence analyst. Read the following news articles. Provide a short, bulleted summary of key information, such as player injuries, team morale, or recent news. Do not make up information.\n\nARTICLES:\n{raw_content}")
     return call_gemini(prompt)
