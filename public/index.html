@@ -3,35 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Statistical Football Predictor</title>
+    <title>AI Football Predictor</title>
     <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-
     <div class="container">
         <header>
-            <h1 class="main-title">Statistical Football Predictor</h1>
+            <h1 class="main-title">AI Football Predictor</h1>
             <p id="header-subtitle" class="subtitle">Select a Competition to Begin</p>
         </header>
-
         <nav id="breadcrumb-nav" class="hidden">
             <button id="back-button">← Back</button>
         </nav>
-
-        <main id="content-area">
-            <!-- JavaScript will build all content here -->
-        </main>
-
+        <main id="content-area"></main>
         <div id="loader" class="loader-container hidden">
             <div class="loader"></div>
             <p class="loader-text">Fetching Data...</p>
         </div>
     </div>
-
-    <!-- TEMPLATES: These are the blueprints for our JavaScript -->
 
     <template id="competition-card-template">
         <div class="card competition-card" tabindex="0">
@@ -42,7 +34,6 @@
             </div>
         </div>
     </template>
-
     <template id="fixture-card-template">
         <div class="card fixture-card" tabindex="0">
             <div class="team home-team">
@@ -59,8 +50,6 @@
             </div>
         </div>
     </template>
-
-    <!-- This template is now much simpler -->
     <template id="details-view-template">
         <div class="details-view">
             <div class="details-header">
@@ -76,10 +65,12 @@
             </div>
             <div class="details-grid">
                 <div class="panel prediction-panel">
-                    <h3>📊 Statistical Prediction</h3>
-                    <div id="prediction-content" class="panel-content prediction-result">
-                        <!-- The prediction (e.g., "Home Team Win") goes here -->
-                    </div>
+                    <h3>🤖 AI Analysis &amp; Predictions</h3>
+                    <div id="prediction-content" class="panel-content"></div>
+                </div>
+                <div class="panel news-panel">
+                    <h3>📰 Intelligence Summary</h3>
+                    <div id="news-content" class="panel-content"></div>
                 </div>
             </div>
         </div>
