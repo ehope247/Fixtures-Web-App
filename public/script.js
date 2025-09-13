@@ -1,3 +1,5 @@
+// public/script.js (Final Version with Professional Error Handling)
+
 document.addEventListener('DOMContentLoaded', () => {
     const contentArea = document.getElementById('content-area');
     const loader = document.getElementById('loader');
@@ -19,13 +21,17 @@ document.addEventListener('DOMContentLoaded', () => {
         showLoader(true);
         try {
             const response = await fetch(url);
+            // This is the new part: we check if the response is okay.
             if (!response.ok) {
+                // If not okay, we try to get the error message from our Python brain.
                 const errorData = await response.json();
+                // We use the error message from Python, or a default one.
                 throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
             }
             return await response.json();
         } catch (error) {
-            contentArea.innerHTML = `<p class="error-message">Error: ${error.message}</p>`;
+            // Display the clear error message to the user.
+            contentArea.innerHTML = `<p class="error-message">${error.message}</p>`;
             return null;
         } finally {
             showLoader(false);
@@ -109,8 +115,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (state.view === 'details') {
             state.view = 'fixtures';
             fetchData(`/api/fixtures?id=${state.currentCompetitionId}`).then(fixtures => {
-                if(fixtures) renderFixtures(fixtures);
-aggr_corpus_id: f8b7a0f6-9577-4468-b39f-4318356b2e3e
+                if (fixtures) renderFixtures(fixtures);
             });
         } else if (state.view === 'fixtures') {
             state.view = 'competitions';
@@ -127,10 +132,15 @@ aggr_corpus_id: f8b7a0f6-9577-4468-b39f-4318356b2e3e
         headerSubtitle.textContent = subtitle;
     }
     
+    // --- THIS IS THE NEW, SMARTER INIT FUNCTION ---
     async function init() {
         state.view = 'competitions';
         const competitions = await fetchData('/api/competitions');
-        if (competitions) renderCompetitions(competitions);
+        if (competitions && competitions.length > 0) {
+            renderCompetitions(competitions);
+        } else if (competitions && competitions.length === 0) {
+            contentArea.innerHTML = `<p class="info-message">The live data provider has no competitions available at this time.</p>`;
+        }
     }
 
     contentArea.addEventListener('click', navigate);

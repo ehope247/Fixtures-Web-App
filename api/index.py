@@ -1,4 +1,4 @@
-# api/index.py (Final Masterpiece Version)
+# api/index.py (Final Version with Professional Error Handling)
 
 from flask import Flask, render_template, jsonify, request
 import requests
@@ -19,22 +19,34 @@ FOOTBALL_API_BASE_URL = "https://api.football-data.org/v4"
 TAVILY_API_URL = "https://api.tavily.com/search"
 GEMINI_API_URL = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={GEMINI_API_KEY}"
 
-# The Cache
 api_cache = {}
-CACHE_DURATION_SECONDS = 7200 # Cache results for 2 hours
+CACHE_DURATION_SECONDS = 7200
 
-# --- Main Route & API Endpoints ---
+# Main Route
 @app.route('/')
-def home(): return render_template('index.html')
+def home():
+    return render_template('index.html')
 
+# --- API Endpoints ---
 @app.route('/api/competitions')
 def get_competitions():
-    if not FOOTBALL_API_KEY: return jsonify({"error": "Key not configured"}), 500
+    if not FOOTBALL_API_KEY:
+        return jsonify({"error": "API key is not configured on the server."}), 500
+    
     headers = {'X-Auth-Token': FOOTBALL_API_KEY}
     try:
-        r = requests.get(f"{FOOTBALL_API_BASE_URL}/competitions", headers=headers)
-        r.raise_for_status(); return jsonify(r.json().get('competitions', []))
-    except Exception as e: return jsonify({"error": str(e)}), 500
+        response = requests.get(f"{FOOTBALL_API_BASE_URL}/competitions", headers=headers, timeout=10)
+        response.raise_for_status()
+        
+        competitions = response.json().get('competitions', [])
+        
+        if not competitions:
+            return jsonify({"error": "The live data provider (football-data.org) is not providing any competitions on the free tier at this moment."}), 404
+        
+        return jsonify(competitions)
+
+    except requests.exceptions.RequestException as e:
+        return jsonify({"error": f"Could not connect to the live data provider. Error: {e}"}), 503
 
 @app.route('/api/fixtures')
 def get_fixtures():
@@ -69,10 +81,10 @@ def get_details():
     api_cache[match_id] = {'ts': now, 'data': final_data}
     return jsonify(final_data)
 
-# --- Helper Functions ---
+# Helper Functions
 def call_gemini(prompt):
     print("THROTTLE: Waiting 3 seconds before AI call...")
-    time.sleep(3) # The Smart Throttle
+    time.sleep(3)
     headers = {"Content-Type": "application/json"}
     payload = {"contents": [{"parts": [{"text": prompt}]}]}
     try:
@@ -100,11 +112,8 @@ def get_tavily_news_content(query):
 
 def get_ai_analysis(match_data, standings=None):
     home_name, away_name = match_data.get('homeTeam', {}).get('name', 'Home'), match_data.get('awayTeam', {}).get('name', 'Away')
-    
     news_content = get_tavily_news_content(f"latest football team news, player injuries for {home_name} and {away_name}")
-    
-    prompt = (f"You are a world-class football analyst. First, read the provided team data and recent news articles. "
-              f"Then, provide a complete, expert analysis for the match between {home_name} and {away_name}.\n\n")
+    prompt = (f"You are a world-class football analyst. First, read the provided team data and recent news articles. Then, provide a complete, expert analysis for the match between {home_name} and {away_name}.\n\n")
     if standings and standings.get('standings'):
         home_stats = away_stats = None
         for team in standings['standings'][0].get('table', []):
@@ -114,28 +123,16 @@ def get_ai_analysis(match_data, standings=None):
             home_form, away_form = (f.replace(',', ' ') if f else 'N/A' for f in [home_stats.get('form'), away_stats.get('form')])
             prompt += (f"**DATA ANALYSIS:**\n- **{home_stats['team']['name']}**: Pos {home_stats['position']}, Pts: {home_stats['points']}, Form: {home_form}\n- **{away_stats['team']['name']}**: Pos {away_stats['position']}, Pts: {away_stats['points']}, Form: {away_form}\n\n")
     if news_content: prompt += f"**LATEST NEWS CONTENT:**\n{news_content}\n\n"
-    
-    prompt += ("**FINAL OUTPUT:**\nBased on all available data and news, provide your final analysis in two parts. "
-               "First, a single paragraph of expert analysis that includes key news. "
-               "Second, conclude with three separate prediction lines in this exact format:\n"
-               "Prediction: [Home Win/Draw/Away Win]\nCorrect Score: [e.g., 2-1]\nOver/Under 2.5 Goals: [Over/Under]")
-
+    prompt += ("**FINAL OUTPUT:**\nBased on all available data and news, provide your final analysis in two parts. First, a single paragraph of expert analysis that includes key news. Second, conclude with three separate prediction lines in this exact format:\nPrediction: [Home Win/Draw/Away Win]\nCorrect Score: [e.g., 2-1]\nOver/Under 2.5 Goals: [Over/Under]")
     full_analysis = call_gemini(prompt)
-
-    # We now separate the response into two parts for our website
     try:
         prediction_index = full_analysis.lower().find('prediction:')
         if prediction_index != -1:
-            analysis_text = full_analysis[:prediction_index].strip()
-            prediction_lines = full_analysis[prediction_index:].strip()
-            # In this new model, the "news" is integrated into the main analysis
+            analysis_text, prediction_lines = full_analysis[:prediction_index].strip(), full_analysis[prediction_index:].strip()
             news_summary = "Key news and injuries are integrated into the main analysis above."
             final_prediction = f"{analysis_text}\n\n{prediction_lines}"
         else:
-            final_prediction = full_analysis # Fallback if format is unexpected
-            news_summary = "Could not be separated from analysis."
+            final_prediction, news_summary = full_analysis, "Could not be separated from analysis."
     except:
-        final_prediction = full_analysis
-        news_summary = "Could not be separated from analysis."
-
+        final_prediction, news_summary = full_analysis, "Could not be separated from analysis."
     return {"prediction": final_prediction, "newsSummary": news_summary}
