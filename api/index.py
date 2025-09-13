@@ -1,4 +1,4 @@
-# api/index.py (Final Version with Caching)
+# api/index.py (Temporary Debugging Version to Force Error Message)
 
 from flask import Flask, render_template, jsonify, request
 import requests
@@ -20,20 +20,17 @@ TAVILY_API_URL = "https://api.tavily.com/search"
 GEMINI_API_URL = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={GEMINI_API_KEY}"
 
 # --- THE CACHE ---
-# This dictionary will store our results in memory.
-# Format: { 'match_id': {'timestamp': 123456789, 'data': {...}} }
 api_cache = {}
-CACHE_DURATION_SECONDS = 3600 # Cache results for 1 hour (3600 seconds)
+CACHE_DURATION_SECONDS = 3600
 
-# --- Main Route: Serves the website itself ---
+# --- Main Route ---
 @app.route('/')
 def home():
     return render_template('index.html')
 
-# --- API Endpoint 1: Get all competitions ---
+# --- API Endpoints ---
 @app.route('/api/competitions')
 def get_competitions():
-    # Caching is not necessary here as it's only called once.
     if not FOOTBALL_API_KEY: return jsonify({"error": "Football API key is not configured"}), 500
     headers = {'X-Auth-Token': FOOTBALL_API_KEY}
     try:
@@ -43,10 +40,8 @@ def get_competitions():
         return jsonify(data)
     except requests.exceptions.RequestException as e: return jsonify({"error": str(e)}), 500
 
-# --- API Endpoint 2: Get fixtures for a specific competition ---
 @app.route('/api/fixtures')
 def get_fixtures():
-    # Caching is not necessary here as it's not the expensive call.
     competition_id = request.args.get('id')
     if not competition_id: return jsonify({"error": "Competition ID is required"}), 400
     headers = {'X-Auth-Token': FOOTBALL_API_KEY}
@@ -60,28 +55,17 @@ def get_fixtures():
         return jsonify(data)
     except requests.exceptions.RequestException as e: return jsonify({"error": str(e)}), 500
 
-# --- API Endpoint 3: Get details (AI Prediction & News) for a specific match ---
 @app.route('/api/details')
 def get_details():
     match_id = request.args.get('id')
-    if not match_id:
-        return jsonify({"error": "Match ID is required"}), 400
-
+    if not match_id: return jsonify({"error": "Match ID is required"}), 400
     current_time = time.time()
-
-    # --- CACHE CHECK ---
-    # 1. Check if we have a result for this match_id in our cache
     if match_id in api_cache:
         cached_item = api_cache[match_id]
-        # 2. Check if the cached result is still fresh (less than 1 hour old)
         if current_time - cached_item['timestamp'] < CACHE_DURATION_SECONDS:
-            print(f"CACHE HIT: Returning saved data for match {match_id}")
-            return jsonify(cached_item['data']) # Return the saved data instantly
-
-    # --- If no fresh cache, proceed with API calls ---
-    print(f"CACHE MISS: Fetching new data for match {match_id}")
-
-    # 1. Get Match and Standings Data
+            print(f"CACHE HIT for match {match_id}")
+            return jsonify(cached_item['data'])
+    print(f"CACHE MISS for match {match_id}")
     headers = {'X-Auth-Token': FOOTBALL_API_KEY}
     try:
         match_response = requests.get(f"{FOOTBALL_API_BASE_URL}/matches/{match_id}", headers=headers)
@@ -92,32 +76,15 @@ def get_details():
         standings_data = standings_response.json() if standings_response.status_code == 200 else None
     except requests.exceptions.RequestException as e:
         return jsonify({"error": f"Failed to get match data: {e}"}), 500
-
-    # 2. Get AI Prediction
     prediction = get_gemini_prediction(match_data, standings_data)
-
-    # 3. Get News Summary
     home_team, away_team = match_data.get('homeTeam', {}).get('name', ''), match_data.get('awayTeam', {}).get('name', '')
     news_articles = get_tavily_news(f"latest football team news and player injuries for {home_team} and {away_team}")
     news_summary = get_news_summary(news_articles)
-    
-    # 4. Prepare the final data payload
-    final_data = {
-        "prediction": prediction,
-        "newsSummary": news_summary
-    }
-
-    # --- SAVE TO CACHE ---
-    # Store the new result in our cache with the current timestamp
-    api_cache[match_id] = {
-        'timestamp': current_time,
-        'data': final_data
-    }
-
+    final_data = {"prediction": prediction, "newsSummary": news_summary}
+    api_cache[match_id] = {'timestamp': current_time, 'data': final_data}
     return jsonify(final_data)
 
-
-# --- Helper functions (Unchanged) ---
+# --- Helper Functions ---
 def call_gemini(prompt):
     headers = {"Content-Type": "application/json"}
     payload = {"contents": [{"parts": [{"text": prompt}]}]}
@@ -130,8 +97,9 @@ def call_gemini(prompt):
         content = candidates[0].get('content', {}).get('parts', [{}])[0].get('text')
         return content or "AI returned an empty response."
     except Exception as e:
-        print(f"Gemini Call Error: {e}")
-        return "AI analysis could not be completed at this time."
+        # --- THIS IS THE CRITICAL CHANGE ---
+        # Instead of a generic message, we return the REAL error.
+        return f"The AI has failed. The exact reason is: {e}"
 
 def get_gemini_prediction(match_data, standings=None):
     home_team_name, away_team_name = match_data.get('homeTeam', {}).get('name', 'Home'), match_data.get('awayTeam', {}).get('name', 'Away')
